@@ -1,0 +1,80 @@
+#lang plai
+
+#| Implementación de sucesiones. Una sucesión es una lista posiblemente infinita
+   por ejemplo:
+   La sucesión de todos los números naturales '(0 1 2 3 4 ...).
+   La sucesión de todos los números de fibonacci '(1 2 3 4 5 8 13 ...).
+   La sucesión de todos los números primos '(2 3 5 7 11 12). |#
+
+;; Predicado auxiliar para crear estructuras con elementos de cualquier tipo.
+;; Este predicado se evalúa a verdadero sin importar el valor que reciba.
+;; any? : any -> boolean
+(define (any? a)
+   #t)
+
+;; Predicado auxiliar para verificar que un procedimiento tiene aridad 0. Para
+;; su implementación nos basamos en el procedimiento "procedure-arity" de 
+;; Racket.
+;; zero-arity?: procedure -> boolean
+(define (zero-arity? p)
+   (and (procedure? p) (equal? (procedure-arity p) 0)))
+
+;; El tipo de sato Stream que define una sucesión.
+;; Tiene dos constructores:
+;; · (sempty) Para indicar que la sucesión está vacía.
+;; · (scons h t) Para definir el primer elemento de la sucesión y el patrón que
+;;   permite generar el resto.
+(define-type Stream
+   [sempty]
+   [scons (head any?) (tail zero-arity?)])
+
+;; Procedimiento que obtiene la cabeza de la sucesión.
+;; shead: Stream -> any
+(define (shead s)
+   (if (sempty? s)
+      (error 'shead "empty stream")
+      (scons-head s)))
+
+;; Procedimiento que obtiene el resto de la sucesión. La sucesión obtenida es
+;; equivalente a la que se recibe como parámetro pero sin el el primer elemento.
+;; stail: Stream -> Stream
+(define (stail s)
+   (match s
+      [(sempty) (error 'stail "empty stream")]
+      [(scons h t) (t)]))
+
+;; Procedimiento que obtiene el n-ésimo elemento de la sucesión.
+;; snth: Stream integer -> any
+(define (snth s n)
+   (if (= n 0)
+      (shead s)
+      (snth (stail s) (- n 1))))
+
+;; Procedimiento que regresa los primeros n elemento de la sucesión en forma de
+;; lista.
+;; stake: Stream integer -> list
+(define (stake s n)
+   (if (<= n 0)
+      empty
+      (match s
+         [(sempty) empty]
+         [(scons h t) (cons h (stake (t) (- n 1)))])))
+
+;; Procedimiento que regresa el siguiente elemento de la sucesión.
+;; snext: Stream -> any
+(define (snext s)
+   (match s
+      [(sempty) (error 'snext "empty stream")]
+      [(scons h t) (shead (t))]))
+
+;; Procedimiento que dado un procedimiento f y una sucesión s, aplica el 
+;; procedimiento f a cada elemento en la sucesión.
+;; smap: procedure Stream -> Stream
+(define (smap f s)
+   (error "No implementado.")
+
+;; Procedimiento que dado un predicado p y una sucesión s, regresa una sucesión
+;; conteniendo únicamente los elementos que cumplen el predicado p.
+;; sfilter: procedure Stream -> Stream
+(define (sfilter p s)
+   (error "No implementado"))
